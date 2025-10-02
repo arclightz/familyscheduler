@@ -1,0 +1,201 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  user_id      String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  households   HouseholdMember[]
+  calendars    CalendarConnection[]
+  assignments  Assignment[]
+  profile      GamificationProfile?
+  redemptions  Redemption[]
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Household {
+  household_id String   @id @default(cuid())
+  name         String
+  members      HouseholdMember[]
+  tasks        Task[]
+  plans        Plan[]
+  rewards      Reward[]
+  created_at   DateTime @default(now())
+
+  @@map("households")
+}
+
+model HouseholdMember {
+  id           String   @id @default(cuid())
+  household    Household @relation(fields: [household_id], references: [household_id])
+  household_id String
+  user         User      @relation(fields: [user_id], references: [user_id])
+  user_id      String
+  role         String    // parent, teen, etc.
+  capabilities Json      // e.g. ["adult_only"] - stored as JSON array
+  allergies    Json      // stored as JSON array
+
+  @@unique([household_id, user_id])
+  @@map("household_members")
+}
+
+model Task {
+  task_id        String   @id @default(cuid())
+  household      Household @relation(fields: [household_id], references: [household_id])
+  household_id   String
+  name           String
+  description    String?
+  category       String?
+  duration_min   Int
+  frequency      Json     // e.g. { type: 'daily' } or { type: 'weekly', byWeekday: [1,3,5] }
+  time_windows   Json?    // [{ start:"07:00", end:"08:00" }]
+  constraints    Json?    // { adultsOnly: true }
+  fairness_weight Int      @default(1)
+  rotation_roster Json     @default("[]") // stored as JSON array
+  active         Boolean   @default(true)
+  assignments    Assignment[]
+
+  @@map("tasks")
+}
+
+model Plan {
+  plan_id      String   @id @default(cuid())
+  household    Household @relation(fields: [household_id], references: [household_id])
+  household_id String
+  week_start   DateTime  // Monday 00:00 local
+  status       String    // draft | published
+  assignments  Assignment[]
+  created_at   DateTime  @default(now())
+
+  @@map("plans")
+}
+
+model Assignment {
+  assignment_id String  @id @default(cuid())
+  plan          Plan    @relation(fields: [plan_id], references: [plan_id])
+  plan_id       String
+  task          Task    @relation(fields: [task_id], references: [task_id])
+  task_id       String
+  user          User    @relation(fields: [user_id], references: [user_id])
+  user_id       String  // User who is assigned this task
+  member_id     String  // HouseholdMember.id for quick lookup
+  start_at      DateTime
+  end_at        DateTime
+  status        String  @default("pending") // pending | done | skipped
+  notes         String?
+
+  @@map("assignments")
+}
+
+model CalendarConnection {
+  id         String   @id @default(cuid())
+  user       User     @relation(fields: [user_id], references: [user_id])
+  user_id    String
+  provider   String   // google | microsoft
+  account_id String
+  access     Json     // tokens (encrypted at rest)
+
+  @@map("calendar_connections")
+}
+
+// Gamification Models
+
+model GamificationProfile {
+  id          String   @id @default(cuid())
+  user        User     @relation(fields: [user_id], references: [user_id])
+  user_id     String   @unique
+  xp          Int      @default(0)
+  level       Int      @default(1)
+  streak_days Int      @default(0)
+  last_action DateTime?
+  badges      EarnedBadge[]
+  progress    AchievementProgress[]
+
+  @@map("gamification_profiles")
+}
+
+model Badge {
+  badge_id    String   @id @default(cuid())
+  key         String   @unique
+  name        String
+  description String
+  tier        String   // bronze | silver | gold | special
+  icon        String?
+  rules       Json     // e.g., { type: "count", taskKey: "dog_walk", count: 7 }
+  earned      EarnedBadge[]
+
+  @@map("badges")
+}
+
+model EarnedBadge {
+  id         String @id @default(cuid())
+  profile    GamificationProfile @relation(fields: [profile_id], references: [id])
+  profile_id String
+  badge      Badge   @relation(fields: [badge_id], references: [badge_id])
+  badge_id   String
+  tier       String  // bronze | silver | gold | special
+  earned_at  DateTime @default(now())
+
+  @@map("earned_badges")
+}
+
+model AchievementProgress {
+  id          String  @id @default(cuid())
+  profile     GamificationProfile @relation(fields: [profile_id], references: [id])
+  profile_id  String
+  key         String  // matches Badge.key
+  counter     Int     @default(0)
+  last_update DateTime @default(now())
+
+  @@unique([profile_id, key])
+  @@map("achievement_progress")
+}
+
+model LevelThreshold {
+  level       Int    @id
+  xp_required Int
+  perks       Json?
+
+  @@map("level_thresholds")
+}
+
+model Reward {
+  reward_id    String  @id @default(cuid())
+  household    Household @relation(fields: [household_id], references: [household_id])
+  household_id String
+  name         String
+  description  String?
+  min_level    Int      @default(1)
+  cost_points  Int      @default(0)
+  required_badges Json     @default("[]") // stored as JSON array
+  cooldown_days  Int?    // optional redemption cooldown
+  active       Boolean  @default(true)
+  redemptions  Redemption[]
+
+  @@map("rewards")
+}
+
+model Redemption {
+  redemption_id String @id @default(cuid())
+  reward        Reward  @relation(fields: [reward_id], references: [reward_id])
+  reward_id     String
+  user          User    @relation(fields: [user_id], references: [user_id])
+  user_id       String
+  approved_by   String? // guardian user_id
+  status        String  @default("pending") // pending | approved | rejected
+  created_at    DateTime @default(now())
+
+  @@map("redemptions")
+}
