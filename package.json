@@ -32,6 +32,8 @@
     "googleapis": "^161.0.0",
     "next": "^15.5.4",
     "next-auth": "^4.24.11",
+    "next-pwa": "^5.6.0",
+    "node-cron": "^4.2.1",
     "postcss": "^8.5.6",
     "prisma": "^6.16.3",
     "react": "^19.2.0",
@@ -41,6 +43,7 @@
     "zod": "^4.1.11"
   },
   "devDependencies": {
+    "@types/node-cron": "^3.0.11",
     "@typescript-eslint/eslint-plugin": "^8.45.0",
     "@typescript-eslint/parser": "^8.45.0",
     "tsx": "^4.20.6",

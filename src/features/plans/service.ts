@@ -117,7 +117,10 @@ export async function generateWeeklyPlan(
 /**
  * Publish a draft plan
  */
-export async function publishPlan(plan_id: string): Promise<void> {
+export async function publishPlan(
+  plan_id: string,
+  user_id: string
+): Promise<void> {
   const plan = await prisma.plan.findUnique({
     where: { plan_id },
   });
@@ -132,7 +135,11 @@ export async function publishPlan(plan_id: string): Promise<void> {
 
   await prisma.plan.update({
     where: { plan_id },
-    data: { status: 'published' },
+    data: {
+      status: 'published',
+      published_at: new Date(),
+      published_by: user_id,
+    },
   });
 }
 

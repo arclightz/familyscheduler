@@ -7,16 +7,18 @@ import {
   apiErrorResponse,
 } from '@/lib/api-utils';
 import { publishPlan } from '@/features/plans/service';
+import { requireAuth } from '@/lib/auth-helpers';
 
 export async function POST(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const user = await requireAuth();
     const { data: planId, error } = validateParams(await params);
     if (error) return error;
 
-    await publishPlan(planId);
+    await publishPlan(planId, user.id);
 
     return apiSuccessResponse({ message: 'Plan published successfully' });
   } catch (error) {
