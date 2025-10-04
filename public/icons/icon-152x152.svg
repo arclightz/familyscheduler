@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="152" height="152" viewBox="0 0 152 152" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="152" height="152" fill="#2563eb" rx="22.8"/>
+
+  <!-- Calendar icon -->
+  <g transform="translate(30.400000000000002, 30.400000000000002)">
+    <!-- Calendar body -->
+    <rect x="0" y="15.200000000000001" width="91.2" height="76" fill="white" rx="7.6000000000000005"/>
+
+    <!-- Calendar header -->
+    <rect x="0" y="15.200000000000001" width="91.2" height="18.24" fill="#dbeafe" rx="7.6000000000000005"/>
+
+    <!-- Calendar rings -->
+    <rect x="18.24" y="7.6000000000000005" width="9.12" height="18.24" fill="white" rx="3.04"/>
+    <rect x="63.839999999999996" y="7.6000000000000005" width="9.12" height="18.24" fill="white" rx="3.04"/>
+
+    <!-- Checkmark -->
+    <g transform="translate(22.8, 45.6)">
+      <path d="M 0 15.200000000000001 L 12.16 27.36 L 33.44 3.04"
+            stroke="#2563eb"
+            stroke-width="6.08"
+            fill="none"
+            stroke-linecap="round"
+            stroke-linejoin="round"/>
+    </g>
+  </g>
+</svg>
