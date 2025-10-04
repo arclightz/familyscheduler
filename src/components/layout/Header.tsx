@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import { Button } from '@/components/ui/Button';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 export function Header() {
   const pathname = usePathname();
@@ -76,6 +77,7 @@ export function Header() {
             )}
             {status === 'authenticated' && (
               <div className="flex items-center gap-3">
+                <NotificationBell />
                 <span className="text-sm text-gray-700">
                   {session.user?.name ?? session.user?.email}
                 </span>

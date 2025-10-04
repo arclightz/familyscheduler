@@ -30,20 +30,36 @@ class Logger {
     }
   }
 
-  info(message: string, ...args: unknown[]) {
-    this.log('info', message, ...args);
+  info(message: string | Record<string, any>, ...args: unknown[]) {
+    if (typeof message === 'object') {
+      this.log('info', JSON.stringify(message), ...args);
+    } else {
+      this.log('info', message, ...args);
+    }
   }
 
-  warn(message: string, ...args: unknown[]) {
-    this.log('warn', message, ...args);
+  warn(message: string | Record<string, any>, ...args: unknown[]) {
+    if (typeof message === 'object') {
+      this.log('warn', JSON.stringify(message), ...args);
+    } else {
+      this.log('warn', message, ...args);
+    }
   }
 
-  error(message: string, ...args: unknown[]) {
-    this.log('error', message, ...args);
+  error(message: string | Record<string, any>, ...args: unknown[]) {
+    if (typeof message === 'object') {
+      this.log('error', JSON.stringify(message), ...args);
+    } else {
+      this.log('error', message, ...args);
+    }
   }
 
-  debug(message: string, ...args: unknown[]) {
-    this.log('debug', message, ...args);
+  debug(message: string | Record<string, any>, ...args: unknown[]) {
+    if (typeof message === 'object') {
+      this.log('debug', JSON.stringify(message), ...args);
+    } else {
+      this.log('debug', message, ...args);
+    }
   }
 }
 

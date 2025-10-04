@@ -11,20 +11,21 @@ datasource db {
 }
 
 model User {
-  user_id      String   @id @default(cuid())
-  email        String   @unique
-  name         String?
+  user_id       String   @id @default(cuid())
+  email         String   @unique
+  name          String?
   emailVerified DateTime?
-  image        String?
-  households   HouseholdMember[]
-  calendars    CalendarConnection[]
-  assignments  Assignment[]
-  profile      GamificationProfile?
-  redemptions  Redemption[]
-  accounts     Account[]
-  sessions     Session[]
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
+  image         String?
+  households    HouseholdMember[]
+  calendars     CalendarConnection[]
+  assignments   Assignment[]
+  profile       GamificationProfile?
+  redemptions   Redemption[]
+  notifications Notification[]
+  accounts      Account[]
+  sessions      Session[]
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
 
   @@map("users")
 }
@@ -245,4 +246,50 @@ model Redemption {
   created_at    DateTime @default(now())
 
   @@map("redemptions")
+}
+
+// Notification Models
+
+model Notification {
+  notification_id String   @id @default(cuid())
+  user            User     @relation(fields: [user_id], references: [user_id])
+  user_id         String
+  type            String   // reminder | achievement | system | plan_published
+  title           String
+  message         String
+  action_url      String?  // deep link to relevant page
+  reference_id    String?  // assignment_id, badge_id, etc.
+  reference_type  String?  // assignment | badge | plan
+  read            Boolean  @default(false)
+  created_at      DateTime @default(now())
+
+  @@index([user_id, read])
+  @@map("notifications")
+}
+
+model ReminderSchedule {
+  schedule_id  String   @id @default(cuid())
+  user_id      String
+  task_id      String?  // optional: specific task reminders
+  enabled      Boolean  @default(true)
+  frequency    String   // daily | before_task | weekly_summary
+  time         String?  // HH:mm format for daily reminders
+  offset_min   Int?     // minutes before task for before_task reminders
+  channels     Json     // ["push", "email"]
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  @@map("reminder_schedules")
+}
+
+model PushSubscription {
+  id           String   @id @default(cuid())
+  user_id      String
+  endpoint     String   @unique
+  keys         Json     // { p256dh, auth }
+  user_agent   String?
+  created_at   DateTime @default(now())
+
+  @@index([user_id])
+  @@map("push_subscriptions")
 }
