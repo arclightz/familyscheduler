@@ -2,12 +2,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
+import { Card, CardContent } from '@/components/ui/Card';
 import { CalendarConnections } from '@/components/calendar/CalendarConnections';
+import { ProfileStats } from '@/components/gamification/ProfileStats';
+import { BadgeDisplay } from '@/components/gamification/BadgeDisplay';
+import { StreakTracker } from '@/components/gamification/StreakTracker';
+import { RewardsList } from '@/components/gamification/RewardsList';
 
 // TODO: Replace with actual user ID from auth context
 const DEMO_USER_ID = 'user-1';
+const DEMO_HOUSEHOLD_ID = 'demo-household';
 
 interface GamificationProfile {
   id: string;
@@ -19,24 +23,39 @@ interface GamificationProfile {
   badges: Array<{
     id: string;
     badge: {
+      badge_id: string;
       key: string;
       name: string;
-      tier: string;
+      tier: 'bronze' | 'silver' | 'gold' | 'special';
       description: string;
+      icon?: string;
     };
     earned_at: Date;
   }>;
 }
 
+interface Reward {
+  reward_id: string;
+  name: string;
+  description: string | null;
+  min_level: number;
+  cost_points: number;
+  required_badges: string[];
+  cooldown_days: number | null;
+  active: boolean;
+}
+
 export function ProfileContent() {
   const searchParams = useSearchParams();
   const [profile, setProfile] = useState<GamificationProfile | null>(null);
+  const [rewards, setRewards] = useState<Reward[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [notification, setNotification] = useState<{
     type: 'success' | 'error';
     message: string;
   } | null>(null);
+  const [redeemLoading, setRedeemLoading] = useState(false);
 
   useEffect(() => {
     // Check for OAuth callback notifications
@@ -63,16 +82,42 @@ export function ProfileContent() {
       setTimeout(() => setNotification(null), 5000);
     }
 
-    const fetchProfile = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch(
+        // Fetch gamification profile
+        const profileRes = await fetch(
           `/api/gamification/profile?user_id=${DEMO_USER_ID}`
         );
-        if (!response.ok) {
+        if (!profileRes.ok) {
           throw new Error('Failed to fetch profile');
         }
-        const data = await response.json();
-        setProfile(data.data);
+        const profileData = await profileRes.json();
+        setProfile(profileData.data);
+
+        // TODO: Fetch rewards from API when endpoint is created
+        // For now, use mock data
+        setRewards([
+          {
+            reward_id: '1',
+            name: 'Extra Screen Time',
+            description: '30 minutes of bonus screen time',
+            min_level: 2,
+            cost_points: 0,
+            required_badges: [],
+            cooldown_days: 7,
+            active: true,
+          },
+          {
+            reward_id: '2',
+            name: 'Pizza Night',
+            description: 'Choose what pizza we order',
+            min_level: 3,
+            cost_points: 0,
+            required_badges: [],
+            cooldown_days: 14,
+            active: true,
+          },
+        ]);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error');
       } finally {
@@ -80,29 +125,41 @@ export function ProfileContent() {
       }
     };
 
-    fetchProfile();
+    fetchData();
   }, [searchParams]);
 
-  const calculateNextLevel = (currentXP: number, currentLevel: number) => {
-    const thresholds = [0, 100, 300, 700, 1500, 3000];
-    const nextThreshold = thresholds[currentLevel] || thresholds[thresholds.length - 1] * 2;
-    const prevThreshold = thresholds[currentLevel - 1] || 0;
-    const progress = ((currentXP - prevThreshold) / (nextThreshold - prevThreshold)) * 100;
+  const handleRedeemReward = async (rewardId: string) => {
+    setRedeemLoading(true);
+    try {
+      // TODO: Implement actual redemption API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      setNotification({
+        type: 'success',
+        message: 'Reward request submitted! Awaiting parent approval.',
+      });
+      setTimeout(() => setNotification(null), 5000);
+    } catch (err) {
+      setNotification({
+        type: 'error',
+        message: 'Failed to redeem reward. Please try again.',
+      });
+      setTimeout(() => setNotification(null), 5000);
+    } finally {
+      setRedeemLoading(false);
+    }
+  };
 
-    return {
-      nextThreshold,
-      prevThreshold,
-      progress: Math.min(progress, 100),
-      xpNeeded: Math.max(0, nextThreshold - currentXP),
-    };
+  const calculateNextLevelXP = (level: number): number => {
+    const thresholds = [0, 100, 300, 700, 1500, 3000];
+    return thresholds[level] || thresholds[thresholds.length - 1] * 2;
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
         <p className="text-gray-600 mt-2">
-          Track your progress and achievements
+          Track your progress, achievements, and rewards
         </p>
       </div>
 
@@ -136,153 +193,36 @@ export function ProfileContent() {
       )}
 
       {profile && (
-        <div className="space-y-6">
-          {/* XP and Level */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Level & Experience</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center mb-6">
-                <div className="text-6xl font-bold text-blue-600 mb-2">
-                  Level {profile.level}
-                </div>
-                <div className="text-2xl font-semibold text-gray-700">
-                  {profile.xp} XP
-                </div>
-              </div>
+        <div className="space-y-8">
+          {/* Profile Stats */}
+          <ProfileStats
+            xp={profile.xp}
+            level={profile.level}
+            streakDays={profile.streak_days}
+            nextLevelXp={calculateNextLevelXP(profile.level)}
+          />
 
-              {/* Progress Bar */}
-              {(() => {
-                const levelData = calculateNextLevel(profile.xp, profile.level);
-                return (
-                  <div>
-                    <div className="flex justify-between text-sm text-gray-600 mb-2">
-                      <span>Level {profile.level}</span>
-                      <span>
-                        {levelData.xpNeeded} XP to Level {profile.level + 1}
-                      </span>
-                    </div>
-                    <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-500"
-                        style={{ width: `${levelData.progress}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })()}
-            </CardContent>
-          </Card>
-
-          {/* Streak */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Current Streak</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-center">
-                <div className="text-center">
-                  <div className="text-5xl mb-2">🔥</div>
-                  <div className="text-4xl font-bold text-orange-600">
-                    {profile.streak_days}
-                  </div>
-                  <div className="text-sm text-gray-600 mt-1">
-                    {profile.streak_days === 1 ? 'day' : 'days'}
-                  </div>
-                </div>
-              </div>
-              {profile.last_action && (
-                <p className="text-center text-sm text-gray-500 mt-4">
-                  Last activity:{' '}
-                  {new Date(profile.last_action).toLocaleDateString()}
-                </p>
-              )}
-            </CardContent>
-          </Card>
+          {/* Streak Tracker */}
+          <StreakTracker
+            streakDays={profile.streak_days}
+            lastActionDate={profile.last_action}
+          />
 
           {/* Badges */}
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                Badges ({profile.badges?.length || 0})
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {!profile.badges || profile.badges.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <p className="mb-2">No badges earned yet</p>
-                  <p className="text-sm">
-                    Complete tasks to earn your first badge!
-                  </p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {profile.badges.map((earnedBadge) => (
-                    <div
-                      key={earnedBadge.id}
-                      className="p-4 border border-gray-200 rounded-lg"
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <h4 className="font-semibold text-lg">
-                            {earnedBadge.badge.name}
-                          </h4>
-                          <p className="text-sm text-gray-600 mt-1">
-                            {earnedBadge.badge.description}
-                          </p>
-                        </div>
-                        <Badge
-                          variant={
-                            earnedBadge.badge.tier === 'gold'
-                              ? 'warning'
-                              : earnedBadge.badge.tier === 'silver'
-                                ? 'default'
-                                : 'info'
-                          }
-                        >
-                          {earnedBadge.badge.tier}
-                        </Badge>
-                      </div>
-                      <p className="text-xs text-gray-500 mt-2">
-                        Earned{' '}
-                        {new Date(earnedBadge.earned_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <BadgeDisplay
+            earnedBadges={profile.badges.map((eb) => ({
+              ...eb.badge,
+              earned_at: eb.earned_at,
+            }))}
+          />
 
-          {/* Stats Summary */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Stats</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <div className="text-3xl font-bold text-blue-600">
-                    {profile.level}
-                  </div>
-                  <div className="text-sm text-gray-600 mt-1">Level</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-bold text-green-600">
-                    {profile.badges?.length || 0}
-                  </div>
-                  <div className="text-sm text-gray-600 mt-1">Badges</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-bold text-orange-600">
-                    {profile.streak_days}
-                  </div>
-                  <div className="text-sm text-gray-600 mt-1">Streak</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Rewards */}
+          <RewardsList
+            rewards={rewards}
+            userLevel={profile.level}
+            onRedeem={handleRedeemReward}
+            isLoading={redeemLoading}
+          />
 
           {/* Calendar Integrations */}
           <CalendarConnections userId={DEMO_USER_ID} />
