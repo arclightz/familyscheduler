@@ -8,6 +8,7 @@ import {
   createApiError,
   apiErrorResponse,
 } from '@/lib/api-utils';
+import { updateAssignmentStatus } from '@/features/plans/service';
 
 export async function GET(
   request: NextRequest,
@@ -73,14 +74,35 @@ export async function PATCH(
       return apiErrorResponse(error, 404);
     }
 
-    const assignment = await prisma.assignment.update({
+    // Handle status updates with gamification
+    if (body.status) {
+      await updateAssignmentStatus(
+        assignmentId,
+        body.status,
+        body.notes || undefined
+      );
+    }
+
+    // Update other fields if provided
+    const updateData: {
+      start_at?: Date;
+      end_at?: Date;
+      notes?: string | null;
+    } = {};
+    if (body.start_at) updateData.start_at = body.start_at;
+    if (body.end_at) updateData.end_at = body.end_at;
+    if (body.notes !== undefined && !body.status) updateData.notes = body.notes;
+
+    if (Object.keys(updateData).length > 0) {
+      await prisma.assignment.update({
+        where: { assignment_id: assignmentId },
+        data: updateData,
+      });
+    }
+
+    // Fetch updated assignment
+    const assignment = await prisma.assignment.findUnique({
       where: { assignment_id: assignmentId },
-      data: {
-        ...(body.start_at && { start_at: body.start_at }),
-        ...(body.end_at && { end_at: body.end_at }),
-        ...(body.status && { status: body.status }),
-        ...(body.notes !== undefined && { notes: body.notes }),
-      },
       include: {
         task: true,
         user: {

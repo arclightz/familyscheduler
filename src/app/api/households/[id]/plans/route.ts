@@ -8,6 +8,7 @@ import {
   createApiError,
   apiErrorResponse,
 } from '@/lib/api-utils';
+import { generateWeeklyPlan } from '@/features/plans/service';
 
 export async function GET(
   request: NextRequest,
@@ -48,7 +49,9 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { data: householdId, error: paramsError } = validateParams(await params);
+    const { data: householdId, error: paramsError } = validateParams(
+      await params
+    );
     if (paramsError) return paramsError;
 
     const { data: body, error } = await validateRequestBody(
@@ -83,16 +86,14 @@ export async function POST(
       return apiErrorResponse(error, 409);
     }
 
-    const plan = await prisma.plan.create({
-      data: {
-        household_id: householdId,
-        week_start: body.week_start,
-        status: 'draft',
-      },
+    // Generate weekly plan using scheduling engine
+    const result = await generateWeeklyPlan({
+      household_id: householdId,
+      week_start: body.week_start,
+      // TODO: Integrate calendar events from connected calendars
     });
 
-    const parsedPlan = PlanSchema.parse(plan);
-    return apiSuccessResponse(parsedPlan, 201);
+    return apiSuccessResponse(result, 201);
   } catch (error) {
     return handleApiError(error);
   }
