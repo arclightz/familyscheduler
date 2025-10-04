@@ -1,10 +1,12 @@
 import Link from 'next/link';
+import { NavBar } from '@/components/layout/nav-bar';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+      <NavBar />
       <div className="container mx-auto px-4 py-16 max-w-6xl">
         <main className="text-center">
           <h1 className="text-6xl font-bold mb-6 text-blue-600">

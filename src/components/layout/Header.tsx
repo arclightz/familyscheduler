@@ -2,9 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSession, signOut } from 'next-auth/react';
+import { Button } from '@/components/ui/Button';
 
 export function Header() {
   const pathname = usePathname();
+  const { data: session, status } = useSession();
 
   const isActive = (path: string) => pathname === path;
 
@@ -19,48 +22,73 @@ export function Header() {
             </span>
           </Link>
 
-          <nav className="flex items-center space-x-1">
-            <Link
-              href="/planner"
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                isActive('/planner')
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              Planner
-            </Link>
-            <Link
-              href="/tasks"
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                isActive('/tasks')
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              Tasks
-            </Link>
-            <Link
-              href="/members"
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                isActive('/members')
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              Members
-            </Link>
-            <Link
-              href="/profile"
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                isActive('/profile')
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              Profile
-            </Link>
-          </nav>
+          <div className="flex items-center space-x-4">
+            <nav className="flex items-center space-x-1">
+              <Link
+                href="/planner"
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  isActive('/planner')
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                Planner
+              </Link>
+              <Link
+                href="/tasks"
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  isActive('/tasks')
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                Tasks
+              </Link>
+              <Link
+                href="/members"
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  isActive('/members')
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                Members
+              </Link>
+              <Link
+                href="/profile"
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  isActive('/profile')
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                Profile
+              </Link>
+            </nav>
+
+            {status === 'loading' && (
+              <div className="text-sm text-gray-500">Loading...</div>
+            )}
+            {status === 'unauthenticated' && (
+              <Link href={'/auth/signin' as any}>
+                <Button size="sm">Sign In</Button>
+              </Link>
+            )}
+            {status === 'authenticated' && (
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-gray-700">
+                  {session.user?.name ?? session.user?.email}
+                </span>
+                <Button
+                  onClick={() => signOut({ callbackUrl: '/' })}
+                  variant="outline"
+                  size="sm"
+                >
+                  Sign Out
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>
