@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Header } from '@/components/layout/Header';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
+import { CalendarConnections } from '@/components/calendar/CalendarConnections';
 
 // TODO: Replace with actual user ID from auth context
 const DEMO_USER_ID = 'user-1';
@@ -28,11 +30,41 @@ interface GamificationProfile {
 }
 
 export default function ProfilePage() {
+  const searchParams = useSearchParams();
   const [profile, setProfile] = useState<GamificationProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [notification, setNotification] = useState<{
+    type: 'success' | 'error';
+    message: string;
+  } | null>(null);
 
   useEffect(() => {
+    // Check for OAuth callback notifications
+    const calendarConnected = searchParams.get('calendar_connected');
+    const errorParam = searchParams.get('error');
+
+    if (calendarConnected) {
+      setNotification({
+        type: 'success',
+        message: `${calendarConnected === 'google' ? 'Google' : 'Microsoft'} Calendar connected successfully!`,
+      });
+      // Clear notification after 5 seconds
+      setTimeout(() => setNotification(null), 5000);
+    } else if (errorParam) {
+      const errorMessages: Record<string, string> = {
+        google_auth_failed: 'Google Calendar authorization failed',
+        google_connection_failed: 'Failed to connect Google Calendar',
+        microsoft_auth_failed: 'Microsoft Calendar authorization failed',
+        microsoft_connection_failed: 'Failed to connect Microsoft Calendar',
+      };
+      setNotification({
+        type: 'error',
+        message: errorMessages[errorParam] || 'An error occurred',
+      });
+      setTimeout(() => setNotification(null), 5000);
+    }
+
     const fetchProfile = async () => {
       try {
         const response = await fetch(
@@ -51,7 +83,7 @@ export default function ProfilePage() {
     };
 
     fetchProfile();
-  }, []);
+  }, [searchParams]);
 
   const calculateNextLevel = (currentXP: number, currentLevel: number) => {
     // Level thresholds from seed data
@@ -79,6 +111,19 @@ export default function ProfilePage() {
               Track your progress and achievements
             </p>
           </div>
+
+          {/* Notification */}
+          {notification && (
+            <div
+              className={`mb-6 p-4 rounded-lg ${
+                notification.type === 'success'
+                  ? 'bg-green-50 border border-green-200 text-green-800'
+                  : 'bg-red-50 border border-red-200 text-red-800'
+              }`}
+            >
+              {notification.message}
+            </div>
+          )}
 
           {loading && (
             <Card>
@@ -244,6 +289,9 @@ export default function ProfilePage() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Calendar Integrations */}
+              <CalendarConnections userId={DEMO_USER_ID} />
             </div>
           )}
         </div>

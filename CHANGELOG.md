@@ -4,6 +4,47 @@ All notable changes to the Family Task Scheduler project.
 
 ## [Unreleased] - 2025-10-04
 
+### Added - Session 3: Calendar Integration
+
+**OAuth Authentication**
+- Google Calendar OAuth 2.0 flow with googleapis
+- Microsoft Calendar OAuth 2.0 flow with Graph API
+- Automatic token refresh for expired credentials
+- Secure token storage (ready for encryption)
+
+**Calendar Services**
+- Google Calendar event fetching (`src/features/calendars/google-calendar.ts`)
+- Microsoft Calendar event fetching (`src/features/calendars/microsoft-calendar.ts`)
+- Unified calendar service for multi-provider support
+- Event normalization to common format
+
+**API Endpoints**
+- `GET /api/calendar/connect/google` - Initiate Google OAuth
+- `GET /api/calendar/connect/google/callback` - Google OAuth callback
+- `GET /api/calendar/connect/microsoft` - Initiate Microsoft OAuth
+- `GET /api/calendar/connect/microsoft/callback` - Microsoft OAuth callback
+- `GET /api/calendar/connections` - List user connections
+- `DELETE /api/calendar/connections` - Disconnect calendar
+- `GET /api/calendar/events` - Fetch events from all connected calendars
+
+**UI Components**
+- Calendar Connections component in Profile page
+- Connect/disconnect functionality with OAuth flow
+- Success/error notifications for calendar operations
+- Connected account display with provider badges
+
+**Documentation**
+- Comprehensive calendar integration guide (`CALENDAR_INTEGRATION.md`)
+- Setup instructions for Google and Microsoft
+- Security considerations and token encryption guidelines
+- API endpoint documentation
+- Troubleshooting guide
+
+**Dependencies Added**
+- `googleapis@^161.0.0` - Google Calendar API client
+- `@microsoft/microsoft-graph-client@^3.0.7` - Microsoft Graph client
+- `@azure/identity@^4.12.0` - Azure authentication
+
 ### Added - Session 2: UI Enhancement
 
 **Navigation & Layout**
@@ -67,12 +108,13 @@ All notable changes to the Family Task Scheduler project.
 ## Project Statistics
 
 **Code Metrics**
-- Total TypeScript files: 35+
-- Lines of code: ~5,000+
-- React components: 15
+- Total TypeScript files: 45+
+- Lines of code: ~6,500+
+- React components: 16
 - Pages: 6 (Home, Planner, Tasks, Task Creation, Members, Profile)
-- API routes: 10
+- API routes: 16 (10 core + 6 calendar)
 - Test files: 1 (15 tests)
+- Calendar services: 3 (Google, Microsoft, Unified)
 
 **Test Coverage**
 - Core scheduler: 100%
@@ -89,9 +131,10 @@ All notable changes to the Family Task Scheduler project.
 - ✅ Task creation workflow
 - ✅ Member management UI
 - ✅ Profile/stats display
+- ✅ Calendar Integration (Google/Microsoft OAuth)
+- ✅ Calendar event fetching and availability sync
 
 **Remaining Features**
-- ⏳ Calendar Integration (Google/Microsoft OAuth)
 - ⏳ NextAuth authentication
 - ⏳ Drag-and-drop task reassignment
 - ⏳ Email/push reminders
