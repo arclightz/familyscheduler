@@ -156,38 +156,43 @@ export function ProfileContent() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
-        <p className="text-gray-600 mt-2">
-          Track your progress, achievements, and rewards
+      <div className="mb-8 animate-fade-in">
+        <h1 className="text-4xl font-extrabold text-secondary-900 mb-2">My Profile</h1>
+        <p className="text-lg text-secondary-600">
+          Track your progress, unlock achievements, and redeem rewards
         </p>
       </div>
 
       {/* Notification */}
       {notification && (
         <div
-          className={`mb-6 p-4 rounded-lg ${
+          className={`mb-6 p-4 rounded-xl border-2 animate-slide-down ${
             notification.type === 'success'
-              ? 'bg-green-50 border border-green-200 text-green-800'
-              : 'bg-red-50 border border-red-200 text-red-800'
+              ? 'bg-accent-green-50 border-accent-green-200 text-accent-green-900'
+              : 'bg-red-50 border-red-200 text-red-900'
           }`}
         >
-          {notification.message}
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">{notification.type === 'success' ? '✅' : '⚠️'}</span>
+            <span className="font-semibold">{notification.message}</span>
+          </div>
         </div>
       )}
 
       {loading && (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <p className="text-gray-500">Loading profile...</p>
+        <Card className="border-2">
+          <CardContent className="py-16 text-center">
+            <div className="w-12 h-12 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-secondary-600 font-medium">Loading profile...</p>
           </CardContent>
         </Card>
       )}
 
       {error && (
-        <Card>
+        <Card className="border-2 border-red-200">
           <CardContent className="py-12 text-center">
-            <p className="text-red-600">Error: {error}</p>
+            <div className="text-5xl mb-4">⚠️</div>
+            <p className="text-red-600 font-semibold">Error: {error}</p>
           </CardContent>
         </Card>
       )}

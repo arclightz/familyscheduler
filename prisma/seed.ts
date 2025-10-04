@@ -3,11 +3,12 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  // Create users
+  // Create users with verified emails for development authentication
   const parentA = await prisma.user.create({
     data: {
       email: 'parent.a@example.com',
       name: 'Parent A',
+      emailVerified: new Date(),
     },
   });
 
@@ -15,6 +16,7 @@ async function main() {
     data: {
       email: 'parent.b@example.com',
       name: 'Parent B',
+      emailVerified: new Date(),
     },
   });
 
@@ -22,6 +24,7 @@ async function main() {
     data: {
       email: 'teen@example.com',
       name: 'Teen',
+      emailVerified: new Date(),
     },
   });
 

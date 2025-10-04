@@ -88,37 +88,54 @@ export default function PlannerPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen">
+      <div className="min-h-screen bg-gradient-to-br from-primary-50/30 via-white to-accent-purple-50/30">
         <div className="container mx-auto px-4 py-8 max-w-7xl">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Weekly Planner</h1>
-            <p className="text-gray-600 mt-2">
-              Manage your household tasks and assignments
+          <div className="mb-8 animate-fade-in">
+            <h1 className="text-4xl font-extrabold text-secondary-900 mb-2">Weekly Planner</h1>
+            <p className="text-lg text-secondary-600">
+              Manage your household tasks and assignments with smart scheduling
             </p>
           </div>
 
           {/* Plans List Sidebar */}
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          <div className="lg:col-span-1">
-            <Card>
+          <div className="lg:col-span-1 space-y-4">
+            <Card className="border-2">
               <CardHeader>
-                <CardTitle className="text-lg">Plans</CardTitle>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <span className="w-2 h-2 bg-primary-500 rounded-full"></span>
+                  Plans
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <Button
                   onClick={handleGeneratePlan}
                   disabled={isGenerating}
+                  variant="gradient"
                   className="w-full mb-4"
                 >
-                  {isGenerating ? 'Generating...' : 'Generate New Plan'}
+                  {isGenerating ? (
+                    <span className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Generating...
+                    </span>
+                  ) : (
+                    '+ Generate New Plan'
+                  )}
                 </Button>
 
                 {plansLoading ? (
-                  <div className="text-sm text-gray-500">Loading plans...</div>
+                  <div className="flex items-center gap-2 text-sm text-secondary-500">
+                    <div className="w-2 h-2 bg-primary-500 rounded-full animate-pulse"></div>
+                    Loading plans...
+                  </div>
                 ) : plans.length === 0 ? (
-                  <div className="text-sm text-gray-500">
-                    No plans yet. Generate one to get started!
+                  <div className="text-center py-8">
+                    <div className="text-4xl mb-3">📋</div>
+                    <p className="text-sm text-secondary-500 font-medium">
+                      No plans yet. Generate one to get started!
+                    </p>
                   </div>
                 ) : (
                   <div className="space-y-2">
@@ -126,13 +143,13 @@ export default function PlannerPage() {
                       <button
                         key={p.plan_id}
                         onClick={() => setSelectedPlanId(p.plan_id)}
-                        className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                        className={`w-full text-left p-3 rounded-lg border-2 transition-all duration-200 ${
                           selectedPlanId === p.plan_id
-                            ? 'border-blue-500 bg-blue-50'
-                            : 'border-gray-200 hover:border-gray-300'
+                            ? 'border-primary-500 bg-primary-50 shadow-soft'
+                            : 'border-secondary-200 hover:border-primary-300 hover:bg-secondary-50'
                         }`}
                       >
-                        <div className="text-sm font-medium">
+                        <div className="text-sm font-semibold text-secondary-900">
                           {new Date(p.week_start).toLocaleDateString('en-US', {
                             month: 'short',
                             day: 'numeric',
@@ -141,7 +158,9 @@ export default function PlannerPage() {
                         </div>
                         <Badge
                           variant={p.status === 'published' ? 'success' : 'warning'}
-                          className="mt-1"
+                          size="sm"
+                          dot
+                          className="mt-2"
                         >
                           {p.status}
                         </Badge>
@@ -156,19 +175,22 @@ export default function PlannerPage() {
             {/* Main Content */}
             <div className="lg:col-span-3 space-y-6">
             {!plan && !planLoading && (
-              <Card>
-                <CardContent className="py-12 text-center">
-                  <p className="text-gray-500">
-                    Select a plan from the sidebar or generate a new one
+              <Card className="border-2 border-dashed border-secondary-300">
+                <CardContent className="py-16 text-center">
+                  <div className="text-6xl mb-4">📅</div>
+                  <h3 className="text-xl font-bold text-secondary-900 mb-2">No Plan Selected</h3>
+                  <p className="text-secondary-600 max-w-md mx-auto">
+                    Select an existing plan from the sidebar or generate a new one to get started
                   </p>
                 </CardContent>
               </Card>
             )}
 
             {planLoading && (
-              <Card>
-                <CardContent className="py-12 text-center">
-                  <p className="text-gray-500">Loading plan...</p>
+              <Card className="border-2">
+                <CardContent className="py-16 text-center">
+                  <div className="w-12 h-12 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4"></div>
+                  <p className="text-secondary-600 font-medium">Loading plan...</p>
                 </CardContent>
               </Card>
             )}
@@ -176,11 +198,11 @@ export default function PlannerPage() {
             {plan && (
               <>
                 {/* Plan Header */}
-                <Card>
+                <Card className="border-2 border-primary-200" gradient>
                   <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle>
+                    <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <CardTitle className="text-2xl mb-2">
                           Week of{' '}
                           {new Date(plan.week_start).toLocaleDateString('en-US', {
                             month: 'long',
@@ -188,43 +210,46 @@ export default function PlannerPage() {
                             year: 'numeric',
                           })}
                         </CardTitle>
-                        <p className="text-sm text-gray-600 mt-1">
+                        <p className="text-base text-secondary-600 font-medium flex items-center gap-2">
+                          <span className="w-2 h-2 bg-accent-green-500 rounded-full"></span>
                           {plan.household.name}
                         </p>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 items-center">
                         <Badge
                           variant={plan.status === 'published' ? 'success' : 'warning'}
+                          size="lg"
+                          dot
                         >
-                          {plan.status}
+                          {plan.status.toUpperCase()}
                         </Badge>
                         {plan.status === 'draft' && (
-                          <Button size="sm" onClick={handlePublishPlan}>
-                            Publish
+                          <Button size="sm" variant="success" onClick={handlePublishPlan}>
+                            Publish Plan
                           </Button>
                         )}
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-3 gap-4 text-center">
-                      <div>
-                        <div className="text-2xl font-bold text-blue-600">
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="bg-white rounded-lg p-4 text-center border-2 border-primary-200 shadow-soft">
+                        <div className="text-3xl font-extrabold text-primary-600 mb-1">
                           {plan.assignments.length}
                         </div>
-                        <div className="text-sm text-gray-600">Total Tasks</div>
+                        <div className="text-sm font-semibold text-secondary-600">Total Tasks</div>
                       </div>
-                      <div>
-                        <div className="text-2xl font-bold text-green-600">
+                      <div className="bg-white rounded-lg p-4 text-center border-2 border-accent-green-200 shadow-soft">
+                        <div className="text-3xl font-extrabold text-accent-green-600 mb-1">
                           {plan.assignments.filter((a) => a.status === 'done').length}
                         </div>
-                        <div className="text-sm text-gray-600">Completed</div>
+                        <div className="text-sm font-semibold text-secondary-600">Completed</div>
                       </div>
-                      <div>
-                        <div className="text-2xl font-bold text-gray-600">
+                      <div className="bg-white rounded-lg p-4 text-center border-2 border-secondary-200 shadow-soft">
+                        <div className="text-3xl font-extrabold text-secondary-600 mb-1">
                           {plan.assignments.filter((a) => a.status === 'pending').length}
                         </div>
-                        <div className="text-sm text-gray-600">Pending</div>
+                        <div className="text-sm font-semibold text-secondary-600">Pending</div>
                       </div>
                     </div>
                   </CardContent>
@@ -234,9 +259,12 @@ export default function PlannerPage() {
                 {workloads.length > 0 && <FairnessMeter workloads={workloads} />}
 
                 {/* Weekly Calendar */}
-                <Card>
+                <Card className="border-2">
                   <CardHeader>
-                    <CardTitle>Schedule</CardTitle>
+                    <CardTitle className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-primary-500 rounded-full"></span>
+                      Weekly Schedule
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <WeeklyCalendar

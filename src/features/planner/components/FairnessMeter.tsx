@@ -24,32 +24,48 @@ export interface FairnessMeterProps {
 export function FairnessMeter({ workloads, className = '' }: FairnessMeterProps) {
   const maxMinutes = Math.max(...workloads.map((w) => w.total_minutes), 1);
 
+  const colors = [
+    'from-primary-500 to-primary-600',
+    'from-accent-purple-500 to-accent-purple-600',
+    'from-accent-green-500 to-accent-green-600',
+    'from-accent-orange-500 to-accent-orange-600',
+    'from-secondary-500 to-secondary-600',
+  ];
+
   return (
-    <Card className={className}>
+    <Card className={`${className} border-2`}>
       <CardHeader>
-        <CardTitle className="text-lg">Workload Distribution</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <span className="w-2 h-2 bg-accent-green-500 rounded-full"></span>
+          Workload Distribution
+        </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          {workloads.map((workload) => {
+        <div className="space-y-5">
+          {workloads.map((workload, index) => {
             const percentage = (workload.total_minutes / maxMinutes) * 100;
             const hours = Math.floor(workload.total_minutes / 60);
             const minutes = workload.total_minutes % 60;
 
             return (
-              <div key={workload.user_id}>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-medium">
-                    {workload.name || workload.email}
-                  </span>
-                  <span className="text-xs text-gray-600">
+              <div key={workload.user_id} className="group">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <div className={`w-8 h-8 bg-gradient-to-br ${colors[index % colors.length]} rounded-full flex items-center justify-center text-white text-xs font-bold shadow-soft`}>
+                      {workload.name?.[0] ?? workload.email[0]}
+                    </div>
+                    <span className="text-sm font-bold text-secondary-900">
+                      {workload.name || workload.email}
+                    </span>
+                  </div>
+                  <span className="text-xs font-semibold text-secondary-600 bg-secondary-100 px-2 py-1 rounded-lg">
                     {hours > 0 && `${hours}h `}
                     {minutes}m · {workload.task_count} tasks
                   </span>
                 </div>
-                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div className="h-3 bg-secondary-200 rounded-full overflow-hidden shadow-inner">
                   <div
-                    className="h-full bg-blue-600 transition-all duration-500"
+                    className={`h-full bg-gradient-to-r ${colors[index % colors.length]} transition-all duration-500 shadow-soft`}
                     style={{ width: `${percentage}%` }}
                   />
                 </div>
@@ -59,7 +75,7 @@ export function FairnessMeter({ workloads, className = '' }: FairnessMeterProps)
         </div>
 
         {/* Fairness indicator */}
-        <div className="mt-4 pt-4 border-t">
+        <div className="mt-6 pt-6 border-t-2 border-secondary-200">
           {(() => {
             const avg =
               workloads.reduce((sum, w) => sum + w.total_minutes, 0) /
@@ -75,12 +91,22 @@ export function FairnessMeter({ workloads, className = '' }: FairnessMeterProps)
               100 - (stdDev / avg) * 100
             ).toFixed(0);
 
+            const scoreColor =
+              Number(fairnessScore) >= 80
+                ? 'from-accent-green-500 to-accent-green-600'
+                : Number(fairnessScore) >= 60
+                ? 'from-accent-orange-500 to-accent-orange-600'
+                : 'from-red-500 to-red-600';
+
             return (
               <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">
+                <div className={`inline-block text-5xl font-extrabold bg-gradient-to-r ${scoreColor} bg-clip-text text-transparent drop-shadow-lg`}>
                   {fairnessScore}%
                 </div>
-                <div className="text-xs text-gray-600">Fairness Score</div>
+                <div className="text-sm font-semibold text-secondary-600 mt-1">Fairness Score</div>
+                <p className="text-xs text-secondary-500 mt-2">
+                  {Number(fairnessScore) >= 80 ? '✓ Excellent balance' : Number(fairnessScore) >= 60 ? 'Good balance' : 'Consider rebalancing'}
+                </p>
               </div>
             );
           })()}

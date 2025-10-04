@@ -16,69 +16,81 @@ export function ProfileStats({ xp, level, streakDays, nextLevelXp }: ProfileStat
   const xpToNextLevel = nextLevelXp - xp;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {/* Level Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm text-gray-600">Level</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <Card className="border-2 border-primary-200 overflow-hidden" hover>
+        <div className="bg-gradient-to-br from-primary-500 to-primary-600 p-4">
+          <CardTitle className="text-sm text-white/90 font-semibold mb-2">Level</CardTitle>
           <div className="flex items-baseline gap-2">
-            <span className="text-4xl font-bold text-blue-600">{level}</span>
-            <span className="text-gray-500">/ ∞</span>
+            <span className="text-5xl font-extrabold text-white drop-shadow-lg">{level}</span>
+            <span className="text-white/70 text-lg font-medium">/ ∞</span>
           </div>
-          <p className="text-xs text-gray-500 mt-2">
+        </div>
+        <CardContent className="bg-gradient-to-br from-primary-50 to-white">
+          <div className="flex items-center gap-2 text-sm">
+            <div className="flex-1">
+              <div className="h-2 bg-primary-200 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-primary-500 to-primary-600 transition-all duration-500"
+                  style={{ width: `${Math.min((xp / nextLevelXp) * 100, 100)}%` }}
+                />
+              </div>
+            </div>
+          </div>
+          <p className="text-xs text-secondary-600 mt-2 font-semibold">
             {xpToNextLevel} XP to level {level + 1}
           </p>
         </CardContent>
       </Card>
 
       {/* XP Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm text-gray-600">Experience</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <Card className="border-2 border-accent-purple-200 overflow-hidden" hover>
+        <div className="bg-gradient-to-br from-accent-purple-500 to-accent-purple-600 p-4">
+          <CardTitle className="text-sm text-white/90 font-semibold mb-2">Experience Points</CardTitle>
           <div className="flex items-baseline gap-2">
-            <span className="text-4xl font-bold text-purple-600">{xp}</span>
-            <span className="text-gray-500">XP</span>
+            <span className="text-5xl font-extrabold text-white drop-shadow-lg">{xp}</span>
+            <span className="text-white/70 text-lg font-medium">XP</span>
           </div>
-          <div className="mt-3">
-            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+        </div>
+        <CardContent className="bg-gradient-to-br from-accent-purple-50 to-white">
+          <div className="mt-2">
+            <div className="h-3 bg-accent-purple-200 rounded-full overflow-hidden shadow-inner">
               <div
-                className="h-full bg-purple-600 transition-all duration-500"
+                className="h-full bg-gradient-to-r from-accent-purple-500 to-accent-purple-600 transition-all duration-500 shadow-glow-purple"
                 style={{ width: `${xpProgress}%` }}
               />
             </div>
-            <p className="text-xs text-gray-500 mt-1">{Math.round(xpProgress)}% to next level</p>
+            <p className="text-xs text-secondary-600 mt-2 font-semibold">
+              {Math.round(xpProgress)}% progress to next level
+            </p>
           </div>
         </CardContent>
       </Card>
 
       {/* Streak Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm text-gray-600">Streak</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <Card className="border-2 border-accent-orange-200 overflow-hidden" hover>
+        <div className="bg-gradient-to-br from-accent-orange-500 to-accent-orange-600 p-4">
+          <CardTitle className="text-sm text-white/90 font-semibold mb-2">Streak</CardTitle>
           <div className="flex items-baseline gap-2">
-            <span className="text-4xl font-bold text-orange-600">{streakDays}</span>
-            <span className="text-gray-500">days</span>
+            <span className="text-5xl font-extrabold text-white drop-shadow-lg">{streakDays}</span>
+            <span className="text-white/70 text-lg font-medium">days</span>
           </div>
-          <div className="flex gap-1 mt-3">
+        </div>
+        <CardContent className="bg-gradient-to-br from-accent-orange-50 to-white">
+          <div className="flex gap-1.5 mt-2">
             {[...Array(7)].map((_, i) => (
               <div
                 key={i}
-                className={`flex-1 h-2 rounded ${
+                className={`flex-1 h-3 rounded-full transition-all duration-300 ${
                   i < (streakDays % 7)
-                    ? 'bg-orange-600'
-                    : 'bg-gray-200'
+                    ? 'bg-gradient-to-t from-accent-orange-500 to-accent-orange-600 shadow-soft'
+                    : 'bg-secondary-200'
                 }`}
               />
             ))}
           </div>
-          <p className="text-xs text-gray-500 mt-1">
-            {streakDays > 0 ? 'Keep it going!' : 'Complete a task to start'}
+          <p className="text-xs text-secondary-600 mt-2 font-semibold">
+            {streakDays > 0 ? '🔥 Keep the momentum going!' : 'Complete a task to start your streak'}
           </p>
         </CardContent>
       </Card>

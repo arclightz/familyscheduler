@@ -50,17 +50,17 @@ export function WeeklyCalendar({
 
   return (
     <div className="overflow-x-auto">
-      <div className="grid grid-cols-7 gap-3 min-w-[900px]">
+      <div className="grid grid-cols-7 gap-4 min-w-[900px]">
         {days.map((day, index) => (
           <div key={day} className="flex flex-col">
             {/* Day header */}
-            <div className="sticky top-0 z-10 bg-white border-b pb-2 mb-3">
-              <div className="font-semibold text-sm">{day}</div>
-              <div className="text-xs text-gray-500">{formatDate(index)}</div>
+            <div className="sticky top-0 z-10 bg-gradient-to-b from-white to-secondary-50 border-b-2 border-secondary-200 pb-3 mb-3 rounded-t-lg">
+              <div className="font-bold text-base text-secondary-900">{day}</div>
+              <div className="text-xs text-secondary-600 font-semibold">{formatDate(index)}</div>
             </div>
 
             {/* Assignments for this day */}
-            <div className="space-y-2 flex-1">
+            <div className="space-y-3 flex-1 min-h-[200px] bg-secondary-50/30 rounded-lg p-2">
               {assignmentsByDay[index].length > 0 ? (
                 assignmentsByDay[index].map((assignment) => (
                   <AssignmentCard
@@ -73,8 +73,11 @@ export function WeeklyCalendar({
                   />
                 ))
               ) : (
-                <div className="text-xs text-gray-400 italic p-2">
-                  No tasks
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <div className="text-3xl mb-2 opacity-40">📭</div>
+                  <div className="text-xs text-secondary-400 font-medium">
+                    No tasks
+                  </div>
                 </div>
               )}
             </div>
