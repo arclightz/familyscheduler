@@ -8,6 +8,13 @@
 - REST API routes for core functionality
 - Git repository with clean commit history
 
+✅ **Completed Core Features** (Updated 2025-10-04)
+- **Scheduling Engine** - Fair task distribution algorithm
+- **Plan Generation** - Draft/publish workflow with API endpoints
+- **Gamification** - XP, levels, streaks on task completion
+- **Unit Tests** - 15 tests covering core scheduling logic
+- **API Documentation** - See API.md for endpoints
+
 ## 🚀 Immediate Next Steps (Priority Order)
 
 ### 1. Calendar Integration Implementation
@@ -22,15 +29,15 @@
 - [ ] Test calendar integration with mock data
 
 ### 2. Task Scheduling Engine
-**Status**: Pending
-**Files to create**: `src/features/scheduling/`
+**Status**: ✅ Complete
+**Files**: `src/features/plans/scheduler.ts`, `service.ts`
 
-- [ ] Implement core scheduling algorithm
-- [ ] Create availability checker functions
-- [ ] Build fairness distribution logic
-- [ ] Add constraint validation system
-- [ ] Implement rotation roster management
-- [ ] Write comprehensive unit tests for scheduler
+- [x] Implement core scheduling algorithm
+- [x] Create availability checker functions
+- [x] Build fairness distribution logic
+- [x] Add constraint validation system
+- [x] Implement rotation roster management
+- [x] Write comprehensive unit tests for scheduler (15 tests passing)
 
 ### 3. Weekly Planner UI
 **Status**: Pending
