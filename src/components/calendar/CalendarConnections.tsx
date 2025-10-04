@@ -22,6 +22,7 @@ export function CalendarConnections({ userId }: CalendarConnectionsProps) {
 
   useEffect(() => {
     fetchConnections();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   const fetchConnections = async () => {
@@ -194,7 +195,7 @@ export function CalendarConnections({ userId }: CalendarConnectionsProps) {
           <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-sm text-blue-800">
               💡 <strong>Tip:</strong> Connecting your calendar helps us avoid
-              scheduling tasks when you're busy or away.
+              scheduling tasks when you&apos;re busy or away.
             </p>
           </div>
         )}

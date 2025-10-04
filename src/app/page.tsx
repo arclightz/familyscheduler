@@ -35,7 +35,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600 text-sm">
-                  Automatically create weekly plans that respect everyone's calendar
+                  Automatically create weekly plans that respect everyone&apos;s calendar
                   and constraints. Avoid conflicts with calendar integration.
                 </p>
               </CardContent>
@@ -68,7 +68,7 @@ export default function Home() {
           </div>
 
           <div className="mt-16 p-8 bg-blue-100 rounded-lg">
-            <h2 className="text-2xl font-bold mb-4">✅ What's Working</h2>
+            <h2 className="text-2xl font-bold mb-4">✅ What&apos;s Working</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left max-w-3xl mx-auto">
               <div>
                 <h3 className="font-semibold text-blue-900 mb-2">Backend</h3>
