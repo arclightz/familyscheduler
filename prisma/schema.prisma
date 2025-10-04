@@ -293,3 +293,21 @@ model PushSubscription {
   @@index([user_id])
   @@map("push_subscriptions")
 }
+// Admin & Audit Models
+
+model AuditLog {
+  audit_id    String   @id @default(cuid())
+  user_id     String
+  action      String   // create | update | delete | publish
+  entity_type String   // plan | task | household | assignment
+  entity_id   String
+  changes     Json     // before/after state
+  ip_address  String?
+  user_agent  String?
+  created_at  DateTime @default(now())
+
+  @@index([user_id])
+  @@index([entity_type, entity_id])
+  @@index([created_at])
+  @@map("audit_logs")
+}
