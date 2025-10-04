@@ -2,9 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
+import { Header } from '@/components/layout/Header';
 
 interface Task {
   task_id: string;
@@ -27,6 +29,7 @@ interface Task {
 const DEMO_HOUSEHOLD_ID = 'demo-household';
 
 export default function TasksPage() {
+  const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -64,20 +67,22 @@ export default function TasksPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
-        {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Tasks</h1>
-            <p className="text-gray-600 mt-2">
-              Manage your household tasks and their schedules
-            </p>
+    <>
+      <Header />
+      <div className="min-h-screen">
+        <div className="container mx-auto px-4 py-8 max-w-6xl">
+          {/* Header */}
+          <div className="mb-8 flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Tasks</h1>
+              <p className="text-gray-600 mt-2">
+                Manage your household tasks and their schedules
+              </p>
+            </div>
+            <Button onClick={() => router.push('/tasks/new')}>
+              + Create Task
+            </Button>
           </div>
-          <Link href={"/planner" as any} className="inline-block">
-            <Button variant="outline">← Back to Planner</Button>
-          </Link>
-        </div>
 
         {/* Loading State */}
         {loading && (
@@ -198,7 +203,8 @@ export default function TasksPage() {
             )}
           </>
         )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

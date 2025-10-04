@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
+import { Header } from '@/components/layout/Header';
 import { WeeklyCalendar } from '@/features/planner/components/WeeklyCalendar';
 import { FairnessMeter } from '@/features/planner/components/FairnessMeter';
 import { usePlan } from '@/features/planner/hooks/usePlan';
@@ -85,18 +86,20 @@ export default function PlannerPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Weekly Planner</h1>
-          <p className="text-gray-600 mt-2">
-            Manage your household tasks and assignments
-          </p>
-        </div>
+    <>
+      <Header />
+      <div className="min-h-screen">
+        <div className="container mx-auto px-4 py-8 max-w-7xl">
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">Weekly Planner</h1>
+            <p className="text-gray-600 mt-2">
+              Manage your household tasks and assignments
+            </p>
+          </div>
 
-        {/* Plans List Sidebar */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Plans List Sidebar */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <div className="lg:col-span-1">
             <Card>
               <CardHeader>
@@ -150,8 +153,8 @@ export default function PlannerPage() {
             </Card>
           </div>
 
-          {/* Main Content */}
-          <div className="lg:col-span-3 space-y-6">
+            {/* Main Content */}
+            <div className="lg:col-span-3 space-y-6">
             {!plan && !planLoading && (
               <Card>
                 <CardContent className="py-12 text-center">
@@ -245,9 +248,10 @@ export default function PlannerPage() {
                 </Card>
               </>
             )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
